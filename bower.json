@@ -1,0 +1,29 @@
+{
+  "name": "gloups",
+  "version": "1.0.0",
+  "authors": [
+    "dhoko"
+  ],
+  "description": "BackboneJS boilerplate with gulp and browserify",
+  "keywords": [
+    "boilerplate",
+    "backbone"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/js/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "backbone": "~1.1.0",
+    "jquery": "~2.0.3",
+    "lodash": "~2.4.1",
+    "normalize-css": "~2.1.3",
+    "swiftclick": "~1.1.1"
+  }
+}
