@@ -1,25 +1,14 @@
-# Gloups
+gloups-backbone
+=================
 
-> Backbone Boilerplate with Gulp and lodash
+Backbone Boilerplate with Gulp and lodash
 
-## Install it
+## Installation 
 
-***You must have node npm and Gulp and Bower***
+1. `npm install`
+2. `bower install`
 
-- `git clone git@github.com:dhoko/Gloups.git [folder]` (replace [folder] with a name, it is the destination folder)
-- `cd [folder]`
+## Run
 
-### Prepare your environement
+`gulp`
 
-- Install LiveReload for Chrome [LiveReload Chrome Store](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
-
-### Install the boilerplate
-
-- `./gloups install` (*Install Gulp and bower dependencies*)
-- `gulp`
-
-**You must extract the gulp-header to node_modules - replace the existing one**
-
-### Commands
-
-- `./gloups view [Name]` to build a view + partial + route
