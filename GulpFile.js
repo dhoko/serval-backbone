@@ -71,13 +71,7 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
 });
 
 gulp.task('prod',['assets','vendor','templates','scripts','styles'], function() {
-    gulp.run("zip");
-    
-    var app = express();
-    app.use(express.static(path.resolve('./build/')));
-    app.listen(8080, function() {
-      gutil.log('Listening on', 8080);
-    });
+    gulp.start("zip");
 });
 
 // Build my css
