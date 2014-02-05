@@ -27,6 +27,11 @@ var readJson = function(file) {
 // Default task : Open url, lauch server, livereaload
 gulp.task('default',['assets','vendor','templates','scripts','styles'], function() {
 
+    gulp.src('./build/js/app.js')
+      .pipe(header('window.APP_DEBUG = true;'))
+      .pipe(gulp.dest('./build/js/'));
+  
+  
   // Open Google Chrome @ localhost:8080
   gulp.src('./build/index.html')
     .pipe(open("",{
