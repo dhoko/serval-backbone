@@ -27,10 +27,7 @@ var readJson = function(file) {
 // Default task : Open url, lauch server, livereaload
 gulp.task('default',['assets','vendor','templates','scripts','styles'], function() {
 
-    gulp.src('./build/js/app.js')
-      .pipe(header('window.APP_DEBUG = true;'))
-      .pipe(gulp.dest('./build/js/'));
-  
+    gulp.start('debug');
   
   // Open Google Chrome @ localhost:8080
   gulp.src('./build/index.html')
@@ -65,6 +62,8 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
         gulp.run('scripts');
         gulp.run('styles');
         gulp.run('templates');
+        gulp.start('debug');
+        
       });
     });
 
@@ -72,6 +71,12 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
 
 gulp.task('prod',['assets','vendor','templates','scripts','styles'], function() {
     gulp.start("zip");
+});
+
+gulp.task('debug', function(){
+    gulp.src('./build/js/app.js')
+      .pipe(header('window.APP_DEBUG = true;'))
+      .pipe(gulp.dest('./build/js/'));
 });
 
 // Build my css
