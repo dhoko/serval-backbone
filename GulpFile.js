@@ -9,6 +9,8 @@ var gulp       = require('gulp'),
     fs         = require('fs'),
     es         = require('event-stream'),
     livereload = require('gulp-livereload'),
+    archiver    = require('archiver'),
+    header      = require('gulp-header'),
     server = tinylr();
 
 // Open a file and return a JSON
@@ -28,6 +30,7 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
   // Open Google Chrome @ localhost:8080
   gulp.src('./build/index.html')
     .pipe(open("",{
+//      app:"chrome",
       app:"google-chrome",
       // app:"/usr/lib/chromium/chromium",
       url: "http://localhost:8080/"
@@ -60,6 +63,16 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
       });
     });
 
+});
+
+gulp.task('prod',['assets','vendor','templates','scripts','styles'], function() {
+    gulp.run("zip");
+    
+    var app = express();
+    app.use(express.static(path.resolve('./build/')));
+    app.listen(8080, function() {
+      gutil.log('Listening on', 8080);
+    });
 });
 
 // Build my css
@@ -137,4 +150,26 @@ gulp.task('scripts', function(){
 gulp.task('clean', function(){
   var spawn = require('child_process').spawn;
   spawn('rm', ['-r', path.resolve('.') + '/build'], {stdio: 'inherit'});
+});
+
+gulp.task('zip', function(){
+    var output = fs.createWriteStream('./../prod.zip');
+    var archive = archiver('zip');
+    output.on('close', function() {
+        console.log('archiver has been finalized and the output file descriptor has closed.');
+    });
+    archive.on('error', function(err) {
+        throw err;
+    });
+    archive.pipe(output);
+    archive.bulk([
+        { expand: true, cwd: 'build/', src: ['**'] }
+    ]);
+
+    archive.finalize(function(err, bytes) {
+        if (err) {
+            throw err;
+        }
+        console.log(bytes + ' total bytes');
+    });
 });
