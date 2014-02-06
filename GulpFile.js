@@ -69,8 +69,25 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
 
 });
 
-gulp.task('prod',['assets','vendor','templates','scripts','styles'], function() {
+gulp.task('prod',['assets','vendor','templates','scripts','styles', 'manifest'], function() {
     gulp.start("zip");
+});
+
+gulp.task('manifest',function(){
+    var file = fs.readFile('./build/manifest.json', function(err, data){
+        if(err==null){
+            data = JSON.parse(data);
+            var numberVersion = parseFloat(data.app_info.codename)+0.1;
+            if (numberVersion === parseInt(numberVersion)){
+                data.app_info.codename = numberVersion+".0";
+            }else{
+                data.app_info.codename = numberVersion.toString().slice(0,3);
+            }
+            fs.writeFile('./build/manifest.json', JSON.stringify(data));
+        }else{
+            console.log("No Manifest found. The version number incrementation doesn't processed");
+        }
+    });
 });
 
 gulp.task('debug', function(){
