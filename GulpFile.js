@@ -9,6 +9,8 @@ var gulp       = require('gulp'),
     fs         = require('fs'),
     es         = require('event-stream'),
     livereload = require('gulp-livereload'),
+    archiver    = require('archiver'),
+    header      = require('gulp-header'),
     server = tinylr();
 
 // Open a file and return a JSON
@@ -25,9 +27,12 @@ var readJson = function(file) {
 // Default task : Open url, lauch server, livereaload
 gulp.task('default',['assets','vendor','templates','scripts','styles'], function() {
 
+    gulp.start('debug');
+  
   // Open Google Chrome @ localhost:8080
   gulp.src('./build/index.html')
     .pipe(open("",{
+//      app:"chrome",
       app:"google-chrome",
       // app:"/usr/lib/chromium/chromium",
       url: "http://localhost:8080/"
@@ -57,9 +62,38 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
         gulp.run('scripts');
         gulp.run('styles');
         gulp.run('templates');
+        gulp.start('debug');
+        
       });
     });
 
+});
+
+gulp.task('prod',['assets','vendor','templates','scripts','styles', 'manifest'], function() {
+    gulp.start("zip");
+});
+
+gulp.task('manifest',function(){
+    var file = fs.readFile('./build/manifest.json', function(err, data){
+        if(err==null){
+            data = JSON.parse(data);
+            var numberVersion = parseFloat(data.app_info.codename)+0.1;
+            if (numberVersion === parseInt(numberVersion)){
+                data.app_info.codename = numberVersion+".0";
+            }else{
+                data.app_info.codename = numberVersion.toString().slice(0,3);
+            }
+            fs.writeFile('./build/manifest.json', JSON.stringify(data));
+        }else{
+            console.log("No Manifest found. The version number incrementation doesn't processed");
+        }
+    });
+});
+
+gulp.task('debug', function(){
+    gulp.src('./build/js/app.js')
+      .pipe(header('window.APP_DEBUG = true;'))
+      .pipe(gulp.dest('./build/js/'));
 });
 
 // Build my css
@@ -137,4 +171,26 @@ gulp.task('scripts', function(){
 gulp.task('clean', function(){
   var spawn = require('child_process').spawn;
   spawn('rm', ['-r', path.resolve('.') + '/build'], {stdio: 'inherit'});
+});
+
+gulp.task('zip', function(){
+    var output = fs.createWriteStream('./../prod.zip');
+    var archive = archiver('zip');
+    output.on('close', function() {
+        console.log('archiver has been finalized and the output file descriptor has closed.');
+    });
+    archive.on('error', function(err) {
+        throw err;
+    });
+    archive.pipe(output);
+    archive.bulk([
+        { expand: true, cwd: 'build/', src: ['**'] }
+    ]);
+
+    archive.finalize(function(err, bytes) {
+        if (err) {
+            throw err;
+        }
+        console.log(bytes + ' total bytes');
+    });
 });
