@@ -1,6 +1,6 @@
 {
-  "name": "gloups",
-  "version": "0.0.0",
+  "name": "Serval Backbone Generator",
+  "version": "1.0.0",
   "description": "Backbone boilerplate with Gulp",
   "main": "index.js",
   "dependencies": {
@@ -26,7 +26,6 @@
   "keywords": [
     "backbone",
     "boilerplate",
-    "browserify",
     "gulp"
   ],
   "author": "dhoko",
