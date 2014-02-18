@@ -9,6 +9,7 @@ var gulp       = require('gulp'),
     fs         = require('fs'),
     es         = require('event-stream'),
     livereload = require('gulp-livereload'),
+    header      = require('gulp-header'),
     server = tinylr();
 
 // Open a file and return a JSON
@@ -28,8 +29,8 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
   // Open Google Chrome @ localhost:8080
   gulp.src('./build/index.html')
     .pipe(open("",{
-      app:"google-chrome",
-      // app:"/usr/lib/chromium/chromium",
+      // app:"google-chrome",
+      app:"/usr/lib/chromium/chromium",
       url: "http://localhost:8080/"
    }));
 
@@ -54,13 +55,14 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
           "!./build/**/*",
           "!./GulpFile.js"], function (evt) {
         gutil.log(gutil.colors.cyan(evt.path), 'changed');
-        gulp.run('scripts');
-        gulp.run('styles');
-        gulp.run('templates');
+        gulp.start('scripts');
+        gulp.start('styles');
+        gulp.start('templates');
       });
     });
 
 });
+
 
 // Build my css
 gulp.task('styles', function() {
@@ -108,7 +110,7 @@ gulp.task('vendor', function(){
       bowerDep + '/jquery/jquery.min.js',
       bowerDep + '/lodash/dist/lodash.min.js',
       bowerDep + '/backbone/backbone-min.js',
-      bowerDep + '/scratchcard/scratchcard.min.js',
+      bowerDep + '/momentjs/min/moment.min.js'
     ])
       .pipe(concat("vendor.min.js"))
       .pipe(gulp.dest('build/js')),
@@ -129,6 +131,7 @@ gulp.task('scripts', function(){
       './src/js/app.js',
     ])
     .pipe(concat('app.js'))
+    .pipe(gutil.env.type !== 'prod' ? header('window.APP_DEBUG = true;') : gutil.noop())
     .pipe(gulp.dest('./build/js'))
     .pipe(livereload(server));
 });
