@@ -1,6 +1,6 @@
 {
   "name": "serval-backbone",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Backbone boilerplate generator with gulp",
   "main": "index.js",
   "devDependencies": {

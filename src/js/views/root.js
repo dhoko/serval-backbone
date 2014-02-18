@@ -18,7 +18,7 @@
     },
 
     render: function() {
-      this.$el.html(this.template({name: "Gloups"}));
+      this.$el.html(this.template({name: "Seval backbone generator"}));
 
       return this;
     }
