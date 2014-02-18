@@ -1,11 +1,8 @@
 {
-  "name": "Serval Backbone Generator",
+  "name": "serval-backbone",
   "version": "1.0.0",
-  "description": "Backbone boilerplate with Gulp",
+  "description": "Backbone boilerplate generator with gulp",
   "main": "index.js",
-  "dependencies": {
-    "gulp": "*"
-  },
   "devDependencies": {
     "gulp": "*",
     "gulp-browserify": "~0.3.3",

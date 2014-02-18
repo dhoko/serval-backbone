@@ -109,7 +109,7 @@ gulp.task('vendor', function(){
     gulp.src([
       bowerDep + '/jquery/jquery.min.js',
       bowerDep + '/lodash/dist/lodash.min.js',
-      bowerDep + '/backbone/backbone-min.js',
+      bowerDep + '/backbone/backbone.js',
       bowerDep + '/momentjs/min/moment.min.js'
     ])
       .pipe(concat("vendor.min.js"))
