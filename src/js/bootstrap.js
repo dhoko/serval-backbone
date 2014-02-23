@@ -16,13 +16,13 @@
 
     // Custom template for lodash with {{}}
     _.templateSettings = {
-        evaluate:    /{{([\s\S]+?)}}/g,
-        interpolate: /{{=([\s\S]+?)}}/g,
-        escape:      /{{-([\s\S]+?)}}/g
+      evaluate: /{{([\s\S]+?)}}/g,
+      interpolate: /{{=([\s\S]+?)}}/g,
+      escape: /{{-([\s\S]+?)}}/g
     };
 
     win.tpl = function(view) {
-        return _.template(document.getElementById(view + '-viewtpl').innerHTML);
+      return _.template(document.getElementById(view + '-viewtpl').innerHTML);
     };
 
     /**
@@ -31,10 +31,10 @@
      */
     win.resetTimeout = function() {
       if(win.appTimesout.length) {
-          console.log('[App] Reset timeout for ' + win.TIMEOUT_BEFORE_HOME + 's');
-          win.appTimesout.forEach(function(item) {
-              win.clearTimeout(item);
-          });
+        console.log('[App] Reset timeout for ' + win.TIMEOUT_BEFORE_HOME + 's');
+        win.appTimesout.forEach(function(item) {
+          win.clearTimeout(item);
+        });
       }
 
       win.setTimeoutPage();
@@ -42,9 +42,9 @@
 
     win.resetSyncTimeout = function() {
       if(win.syncTimesout.length) {
-          win.syncTimesout.forEach(function(item) {
-              win.clearTimeout(item);
-          });
+        win.syncTimesout.forEach(function(item) {
+          win.clearTimeout(item);
+        });
       }
     };
 
@@ -60,11 +60,11 @@
       delay = delay||win.TIMEOUT_BEFORE_HOME;
 
       if(page.length) {
-          console.log('[App] Open page ' + page + ' in ' + delay + 's');
+        console.log('[App] Open page ' + page + ' in ' + delay + 's');
       }
 
       win.appTimesout.push(setTimeout(function() {
-          App.Routers.Instances.router.navigate(page,{trigger: true});
+        App.Routers.Instances.router.navigate(page,{trigger: true});
       },delay * 1000));
     };
 

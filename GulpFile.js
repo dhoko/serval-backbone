@@ -9,8 +9,10 @@ var gulp       = require('gulp'),
     fs         = require('fs'),
     es         = require('event-stream'),
     livereload = require('gulp-livereload'),
-    header      = require('gulp-header'),
-    server = tinylr();
+    header     = require('gulp-header'),
+    minifyHTML = require('gulp-minify-html'),
+    uglify     = require('gulp-uglify'),
+    server     = tinylr();
 
 // Open a file and return a JSON
 var readJson = function(file) {
@@ -29,8 +31,8 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
   // Open Google Chrome @ localhost:8080
   gulp.src('./build/index.html')
     .pipe(open("",{
-      // app:"google-chrome",
-      app:"/usr/lib/chromium/chromium",
+      app:"google-chrome",
+      // app:"/usr/lib/chromium/chromium",
       url: "http://localhost:8080/"
    }));
 
@@ -40,29 +42,16 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
       gutil.log('Listening on', 8080);
     });
 
-
-    // var ext = path.extname(evt.path);
-    // gutil.log(gutil.colors.yellow(ext), 'File extension');
-
     server.listen(35729, function (err) {
       if (err) return console.log(err);
 
-      // Watch them all
-      gulp.watch([
-          "./**/*",
-          "!./node_modules/**/*",
-          "!./src/vendor/",
-          "!./build/**/*",
-          "!./GulpFile.js"], function (evt) {
-        gutil.log(gutil.colors.cyan(evt.path), 'changed');
-        gulp.start('scripts');
-        gulp.start('styles');
-        gulp.start('templates');
-      });
+      gulp.watch("./src/js/**/*", ["scripts"]);
+      gulp.watch(["./src/layout/**/*","./src/partials/**/*"], ["templates"]);
+      gulp.watch("./src/styles*", ["styles"]);
+      gulp.watch("./src/vendor/**/*", ["vendor"]);
     });
 
 });
-
 
 // Build my css
 gulp.task('styles', function() {
@@ -78,16 +67,16 @@ gulp.task('assets', function() {
     .pipe(gulp.dest('./build/assets/'));
 });
 
-gulp.task('scriptsPartials', function() {
+// Concatenate your partials and append them to index.html
+gulp.task('templates', function() {
+  // Thanks to https://github.com/gulpjs/gulp/issues/82. Without es.concat, we have to do CTRL S to times to have the valid view.
+  return es.concat(
     gulp.src('./src/partials/**/*.html')
+      .pipe(minifyHTML({spare: true}))
       .pipe(partials())
       .pipe(concat('templates.html'))
-      .pipe(gulp.dest('./build'));
-  });
-
-// Concatenate your partials and append them to index.html
-gulp.task('templates', ['scriptsPartials'], function() {
-  return es.concat(
+      .pipe(gulp.dest('./build'))
+  ).on("end", function() {
     gulp.src([
       './src/layout/header.html',
       './src/layout/body.html',
@@ -97,7 +86,7 @@ gulp.task('templates', ['scriptsPartials'], function() {
       .pipe(concat('index.html'))
       .pipe(gulp.dest('./build'))
       .pipe(livereload(server))
-  );
+  });
 });
 
 // Build your vendors
@@ -108,11 +97,12 @@ gulp.task('vendor', function(){
   return es.concat(
     gulp.src([
       bowerDep + '/jquery/jquery.min.js',
-      bowerDep + '/lodash/dist/lodash.min.js',
+      bowerDep + '/lodash/dist/lodash.js',
       bowerDep + '/backbone/backbone.js',
-      bowerDep + '/momentjs/min/moment.min.js'
+      bowerDep + '/momentjs/moment.js'
     ])
       .pipe(concat("vendor.min.js"))
+      // .pipe(uglify())
       .pipe(gulp.dest('build/js')),
     gulp.src(bowerDep + '/normalize-css/normalize.css')
       .pipe(gulp.dest('build/styles'))
