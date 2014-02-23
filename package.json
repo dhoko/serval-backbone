@@ -1,6 +1,6 @@
 {
   "name": "serval-backbone",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Backbone boilerplate generator with gulp",
   "main": "index.js",
   "devDependencies": {
@@ -18,13 +18,15 @@
     "gulp-header": "~1.0.2",
     "gulp-livereload": "~0.2.0"
   },
+  "repository" : "git@github.com:dhoko/serval-backbone.git",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "backbone",
     "boilerplate",
-    "gulp"
+    "gulp",
+    "serval-generator"
   ],
   "author": "dhoko",
   "license": "MIT"
