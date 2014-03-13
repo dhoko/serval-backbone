@@ -47,7 +47,7 @@ gulp.task('default',['assets','vendor','templates','scripts','styles'], function
 
       gulp.watch("./src/js/**/*", ["scripts"]);
       gulp.watch(["./src/layout/**/*","./src/partials/**/*"], ["templates"]);
-      gulp.watch("./src/styles*", ["styles"]);
+      gulp.watch("./src/styles/*", ["styles"]);
       gulp.watch("./src/vendor/**/*", ["vendor"]);
     });
 
