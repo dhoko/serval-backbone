@@ -7,6 +7,7 @@
     win.i18nLoader(function loadI18n() {
       App.Routers.Instances.router = new App.Routers.Router();
       Backbone.history.start();
+      var swiftclick = SwiftClick.attach(doc.body);
     });
   });
 

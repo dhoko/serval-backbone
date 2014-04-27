@@ -1,6 +1,8 @@
 #Serval backbone boilerplate
 
-A boilerplate for **backbone.js**. From [Marrow](http://mdwn.in/gh/kud/marrow).
+A boilerplate for **backbone.js**. From [Marrow](http://mdwn.in/gh/kud/marrow). It's ready for i18n with Yaml files, it's also ready for mobile thanks to Swiftclick.
+
+If you have [docker.js](http://jbt.github.io/docker/src/docker.js.html) you can also build your API documentation !
 
 ## How to install ?
 
@@ -27,6 +29,8 @@ Ok, let's run : `npm install && bower install`
 - Moments.js
 - An HTTP server
 - pushState
+- i18n
+- Swiftclick (no more 300ms)
 - ... all you need to begin a great app and being happy
 
 ## Explanation
@@ -62,6 +66,12 @@ Ok, let's run : `npm install && bower install`
 
 ```
 $ gulp
+```
+
+## Documentation
+
+```
+$ gulp doc
 ```
 
 ## Do you have serval ?
