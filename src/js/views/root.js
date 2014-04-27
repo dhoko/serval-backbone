@@ -1,28 +1,29 @@
 // http://backbonejs.org/#View
 (function(win, doc, App){
+    "use strict";
 
-  /**
-   * Root View
-   * @type {object}
-   */
-  App.Views.RootIndex = Backbone.View.extend({
+    /**
+    * Root View
+    * @type {object}
+    */
+    App.Views.Root = App.Views.MasterView.extend({
 
-    el: '#wrapper',
+        template: tpl('root'),
 
-    template: tpl('root'),
+        events: {
+            "click .btn-action-x" : "button",
+        },
 
-    events: {
-    },
+        button : function button(){
+            console.log("This event is called before we swicth to another page");
+        },
 
-    initialize: function() {
-    },
-
-    render: function() {
-      this.$el.html(this.template({name: "Seval backbone generator"}));
-
-      return this;
-    }
-  });
+        // Execute before the render. It can also bind data to the view.
+        // Here we bind a key lang to the view
+        beforeRender: function beforeRender() {
+            return {lang: App.Languages.available};
+        }
+    });
 
 
 })(window, window.document, window.app || (window.app = {}));

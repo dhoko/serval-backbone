@@ -1,5 +1,7 @@
 (function(win, doc, App){
 
+    "use strict";
+
     App.Models = {};
     App.Models.Instances = {};
     App.Collections = {};
@@ -9,10 +11,13 @@
     App.Routers = {};
     App.Routers.Instances = {};
     App.Events = {};
+    App.Languages = {};
+    App.Languages.Instances = {};
+    App.Languages.available = [];
 
-    win.appTimesout  = [];
-    win.syncTimesout = [];
-    win.TIMEOUT_BEFORE_HOME = 50;
+
+    // Display App's debug if it's 1, 0 to hide them
+    win.VERBOSE = 1;
 
     // Custom template for lodash with {{}}
     _.templateSettings = {
@@ -21,51 +26,84 @@
       escape: /{{-([\s\S]+?)}}/g
     };
 
-    win.tpl = function(view) {
-      return _.template(document.getElementById(view + '-viewtpl').innerHTML);
+    /**
+     * Find our template inside the application
+     * @param  {String} view Your partial name
+     * @return {Object}      Your view for backbone. Parse by lodash
+     * @throws {Error} If The application cannot find the requested view
+     */
+    win.tpl = function tpl(view) {
+      var $view = document.getElementById(view.toLowerCase() + '-viewtpl');
+      if(!$view) {
+        throw new Error('Cannot find the requested view : ' + view);
+      }
+      return _.template($view.innerHTML);
     };
 
     /**
-     * To prevent Memory leak we must reset each timeout after they are triggered
-     * It also prevent from bugs
+     * Helper to open a page
+     * It sends log informations to the driver
+     * @param  {String} page  Page name
+     * @return {void}
      */
-    win.resetTimeout = function() {
-      if(win.appTimesout.length) {
-        console.log('[App] Reset timeout for ' + win.TIMEOUT_BEFORE_HOME + 's');
-        win.appTimesout.forEach(function(item) {
-          win.clearTimeout(item);
-        });
-      }
-
-      win.setTimeoutPage();
+    win.openPage = function openPage(page) {
+      var _page = page || 'root';
+      console.debug("[App@openPage] : Open the page - " + _page);
+      App.Routers.Instances.router.navigate(page,{trigger: true});
     };
-
-    win.resetSyncTimeout = function() {
-      if(win.syncTimesout.length) {
-        win.syncTimesout.forEach(function(item) {
-          win.clearTimeout(item);
-        });
-      }
-    };
-
 
     /**
-     * Open a page after a timeout
-     * @param {String} page  Page name
-     * @param {Integer} delay How many seconds ?
+     * Navigate back in the future
+     * @param  {Integer} howMany
+     * @return {void}
      */
-    win.setTimeoutPage = function(page,delay) {
+    win.back = function back(howMany) {
+        Backbone.history.history.go(-howMany);
+    };
 
-      page = page||'';
-      delay = delay||win.TIMEOUT_BEFORE_HOME;
+    // Remove the App's debug message
+    if(!win.VERBOSE) {
+      console.debug = function(){};
+    }
 
-      if(page.length) {
-        console.log('[App] Open page ' + page + ' in ' + delay + 's');
-      }
+    // Return the value for a field inside the form
+    win.findByKey = function findByKey(o,key) {
+      var field = _.findWhere(o,{name:key });
+      return (field) ? field.value : "";
+    };
 
-      win.appTimesout.push(setTimeout(function() {
-        App.Routers.Instances.router.navigate(page,{trigger: true});
-      },delay * 1000));
+    /**
+     * It loads the i18n inside the application
+     * Your file have to be inside a directory i18n
+     * @param  {Function} cb Callback to execute when we have loaded the translation
+     * @return {void}
+     */
+    win.i18nLoader = function i18nLoader(cb) {
+
+      $.getJSON("../i18n/languages.json", function getI18n(json) {
+
+        // Look for each translations
+        var keys = Object.keys(json || {});
+
+        if(!keys.length) {
+          throw new Error('Empty languages file, no translation found');
+        }
+
+        var current = keys[0];
+        console.debug('[App@i18nLoader] : i18n JSON is loaded', keys);
+
+        // Load each languages to Languages instances
+        for(var lang in json) {
+          App.Languages.Instances[lang] = json[lang];
+          App.Languages.available.push(lang);
+        }
+
+        console.debug('[App@i18nLoader] : Default language loaded - ' +  current);
+        App.Languages.current = current;
+        document.documentElement.lang = current;
+
+        cb();
+      });
     };
 
 })(window, window.document, window.app || (window.app = {}));

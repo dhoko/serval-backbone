@@ -1,0 +1,12 @@
+fr-FR:
+    title: "Bienvenue petit papillon de lumière !"
+    baseline: "Bienvenue sur"
+    baselineInfo: "Serval-boilerplate avec Backbone.js"
+    includes: "Tu peux désormais coder. Tu disposes de :"
+    launchApp: "Ouvre une console et saisi cette commande :"
+    aboutTpl: "On utilise une  version customisée du template lodash cf:"
+    aboutTpl2: "Tu peux modifier ça dans la variable templateSettings, on trouve ça dans ce fichier"
+    aboutLink: "Tu peux aller à la page suivante avec ce lien : "
+    aboutLink2: "ou, en utilisant ce bouton avec un event"
+    aboutAnchor: avec une ancre
+    buttonMsg: Page suivante

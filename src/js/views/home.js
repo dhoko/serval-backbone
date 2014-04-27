@@ -1,28 +1,23 @@
 // http://backbonejs.org/#View
 (function(win, doc, App){
+    "use strict";
+    /**
+    * Root View
+    * @type {object}
+    */
+    App.Views.Home = App.Views.MasterView.extend({
 
-  /**
-   * Root View
-   * @type {object}
-   */
-  App.Views.HomeIndex = Backbone.View.extend({
+        template: tpl('home'),
 
-    el: '#wrapper',
+        events: {
+            "click .btn-action-x" : "button"
+        },
 
-    template: tpl('home'),
+        button : function button(){
+            console.log("This event is called  before we swicth to another page");
+        }
 
-    events: {
-    },
-
-    initialize: function() {
-    },
-
-    render: function() {
-      this.$el.html(this.template);
-
-      return this;
-    }
-  });
+    });
 
 
 })(window, window.document, window.app || (window.app = {}));

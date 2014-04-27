@@ -1,52 +1,61 @@
 // http://backbonejs.org/#Router
 (function(win, doc, App) {
 
+  "use strict";
+
   /**
-   * Router
-   * @type {object}
-   */
+  * Router
+  * @type {object}
+  */
   App.Routers.Router = Backbone.Router.extend({
 
+    // If you are using queries param for a route, duplicate the master, see for home and home/:query
     routes: {
       '': 'root',
       'home': 'home',
-      '*path': 'redirect404' // ALWAYS MUST BE THE LAST ROUTE
+      'home/:query': 'home',
+      '*path': 'redirect404' // The last one, Always dude.
     },
 
     /**
      * Router init
+     * It will create a new instance of each view and listen to transition between pages
      * @return {void}
      */
-    initialize: function() {},
+    initialize: function() {
+      App.Views.Instances.root= new App.Views.Root();
+      App.Views.Instances.home= new App.Views.Home();
+    },
 
     /**
      * Used before every action
+     * If you come to the home page it will create a new session
+     * It also clean your app's timeouts
      * @return {void}
      */
-    before: function() {},
+    before: function(page, query) {},
 
     /**
      * Used after every action
+     * It will create a stat per page for you and also inform the native that we open dat page
      * @return {void}
      */
-    after: function() {},
-
-    root: function() {
-      this.before();
-
-      App.Views.Instances.rootIndex = new App.Views.RootIndex();
-      App.Views.Instances.rootIndex.render();
-
-      this.after();
+    after: function after(page,query) {
+      // Prepare your query to be logged
+      query = (!query) ? '' : '/' + query;
+      console.debug("[Router@after] : Open page - " + page + query);
     },
 
-    home: function() {
-      this.before();
+    root: function root(query) {
+      this.before('root');
+      App.Views.Instances.root.render();
+      this.after('root', query);
+    },
 
-      App.Views.Instances.homeIndex = new App.Views.HomeIndex();
-      App.Views.Instances.homeIndex.render();
-
-      this.after();
+    home: function home(query) {
+      this.before('home');
+      App.Views.Instances.home.render();
+      this.after('home', query);
     },
 
     //=route=//

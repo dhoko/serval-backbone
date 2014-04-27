@@ -1,24 +1,26 @@
+"use strict";
+
 var gulp       = require('gulp'),
     gutil      = require('gulp-util'),
     express    = require('express'),
     path       = require('path'),
     tinylr     = require('tiny-lr'),
-    open       = require("gulp-open"),
+    gopen      = require("gulp-open"),
     concat     = require("gulp-concat"),
     partials   = require('gulp-partial-to-script'),
     fs         = require('fs'),
     es         = require('event-stream'),
     livereload = require('gulp-livereload'),
-    header     = require('gulp-header'),
-    minifyHTML = require('gulp-minify-html'),
-    uglify     = require('gulp-uglify'),
-    server     = tinylr();
+    archiver   = require('archiver'),
+    server     = tinylr(),
+    convert    = require('gulp-convert'),
+    jeditor    = require("gulp-json-editor");
 
 // Open a file and return a JSON
 var readJson = function(file) {
   var src = fs.readFileSync(file, 'utf8', function (err,data) {
     if (err) {
-      return console.log(err);
+      throw err;
     }
     return data;
   });
@@ -26,29 +28,33 @@ var readJson = function(file) {
 };
 
 // Default task : Open url, lauch server, livereaload
-gulp.task('default',['assets','vendor','templates','scripts','styles'], function() {
+gulp.task('default',['assets','vendor','templates','scripts','styles','i18n'], function() {
 
   // Open Google Chrome @ localhost:8080
   gulp.src('./build/index.html')
-    .pipe(open("",{
-      app:"google-chrome",
-      // app:"/usr/lib/chromium/chromium",
-      url: "http://localhost:8080/"
+    .pipe(gopen("",{
+      // app:"google-chrome",
+      app:"/usr/lib/chromium/chromium",
+      url: "http://localhost:8080/build/"
    }));
 
     var app = express();
-    app.use(express.static(path.resolve('./build/')));
+    app.use(express.static(path.resolve('./')));
     app.listen(8080, function() {
       gutil.log('Listening on', 8080);
     });
 
     server.listen(35729, function (err) {
-      if (err) return console.log(err);
+        if (err) {
+            throw err;
+        }
 
-      gulp.watch("./src/js/**/*", ["scripts"]);
-      gulp.watch(["./src/layout/**/*","./src/partials/**/*"], ["templates"]);
-      gulp.watch("./src/styles/*", ["styles"]);
-      gulp.watch("./src/vendor/**/*", ["vendor"]);
+        gulp.watch(["./src/js/**/*","./i18n/*"], ["scripts"]);
+        gulp.watch(["./src/layout/**/*","./src/partials/**/*"], ["templates"]);
+        gulp.watch("./src/styles/*", ["styles"]);
+        gulp.watch("./src/vendor/**/*", ["vendor"]);
+        gulp.watch("./i18n/**/*.yml", ["i18n"]);
+
     });
 
 });
@@ -72,7 +78,6 @@ gulp.task('templates', function() {
   // Thanks to https://github.com/gulpjs/gulp/issues/82. Without es.concat, we have to do CTRL S to times to have the valid view.
   return es.concat(
     gulp.src('./src/partials/**/*.html')
-      .pipe(minifyHTML({spare: true}))
       .pipe(partials())
       .pipe(concat('templates.html'))
       .pipe(gulp.dest('./build'))
@@ -85,10 +90,9 @@ gulp.task('templates', function() {
     ])
       .pipe(concat('index.html'))
       .pipe(gulp.dest('./build'))
-      .pipe(livereload(server))
+      .pipe(livereload(server));
   });
 });
-
 // Build your vendors
 gulp.task('vendor', function(){
 
@@ -96,13 +100,13 @@ gulp.task('vendor', function(){
 
   return es.concat(
     gulp.src([
-      bowerDep + '/jquery/jquery.min.js',
+      bowerDep + '/jquery/dist/jquery.js',
       bowerDep + '/lodash/dist/lodash.js',
       bowerDep + '/backbone/backbone.js',
-      bowerDep + '/momentjs/moment.js'
+      bowerDep + '/momentjs/moment.js',
+      bowerDep + '/swiftclick/js/libs/swiftclick.js'
     ])
       .pipe(concat("vendor.min.js"))
-      // .pipe(uglify())
       .pipe(gulp.dest('build/js')),
     gulp.src(bowerDep + '/normalize-css/normalize.css')
       .pipe(gulp.dest('build/styles'))
@@ -114,6 +118,7 @@ gulp.task('vendor', function(){
 gulp.task('scripts', function(){
   gulp.src([
       './src/js/bootstrap.js',
+      './src/js/events/**/*.js',
       './src/js/models/**/*.js',
       './src/js/collections/**/*.js',
       './src/js/views/**/*.js',
@@ -121,13 +126,25 @@ gulp.task('scripts', function(){
       './src/js/app.js',
     ])
     .pipe(concat('app.js'))
-    .pipe(gutil.env.type !== 'prod' ? header('window.APP_DEBUG = true;') : gutil.noop())
     .pipe(gulp.dest('./build/js'))
     .pipe(livereload(server));
 });
 
-// remove build folder
-gulp.task('clean', function(){
+// Create i18n file for the app
+gulp.task("i18n", function() {
+    gulp.src('./i18n/*.yml')
+        .pipe(concat('languages.yml'))
+        .pipe(convert({
+            from: "yml",
+            to: "json"
+        }))
+        .pipe(concat('languages.json'))
+        .pipe(gulp.dest("./i18n/"))
+        .pipe(livereload(server));
+});
+
+// Generate your documentation using docker
+gulp.task('doc', function(){
   var spawn = require('child_process').spawn;
-  spawn('rm', ['-r', path.resolve('.') + '/build'], {stdio: 'inherit'});
+  spawn('docker', ['-i','./src','-x','vendor','-n'], {stdio: 'inherit'});
 });
