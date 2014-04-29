@@ -14,6 +14,55 @@
     App.Languages = {};
     App.Languages.Instances = {};
     App.Languages.available = [];
+    
+        /**
+     * Get an instance for a view
+     * @param  {String} name Name for a view
+     * @return {Backbone.View}
+     */
+    App.view = function getViewInstance(name) {
+        if(!App.Views.Instances.hasOwnProperty(name)) {
+            throw new Error("Cannot find an Instance for the view : " + name);
+        }
+        return App.Views.Instances[name];
+    }
+
+    /**
+     * Get an instance for a model
+     * @param  {String} name Name for a model
+     * @return {Backbone.Model}
+     */
+    App.model = function getModelInstance(name) {
+        if(!App.Models.Instances.hasOwnProperty(name)) {
+            throw new Error("Cannot find an Instance for the model : " + name);
+        }
+        return App.Models.Instances[name];
+    }
+
+    /**
+     * Get an instance for a collection
+     * @param  {String} name Name for a collection
+     * @return {Backbone.Collection}
+     */
+    App.collection = function getCollectionInstance(name) {
+        if(!App.Collections.Instances.hasOwnProperty(name)) {
+            throw new Error("Cannot find an Instance for the collection : " + name);
+        }
+        return App.Collections.Instances[name];
+    }
+
+    /**
+     * Get an instance for a Language
+     * @param  {String} name Name for a language
+     * @return {Object}
+     */
+    App.lang = function getLanguageInstance(name) {
+        if(!App.Languages.Instances.hasOwnProperty(name)) {
+            throw new Error("Cannot find an Instance for the language : " + name);
+        }
+        return App.Languages.Instances[name];
+    }
+
 
 
     // Display App's debug if it's 1, 0 to hide them
