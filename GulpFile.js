@@ -75,9 +75,7 @@ gulp.task('templates', function() {
         './src/layout/body.html'
         ]),
         gulp.src('./src/partials/**/*.html').pipe(partials()),
-        gulp.src([
-        './src/layout/footer.html',
-        ])
+        gulp.src(['./src/layout/footer.html'])
     )
     .pipe(concat('index.html'))
     .pipe(gulp.dest('./build'))
