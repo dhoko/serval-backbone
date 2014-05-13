@@ -11,7 +11,8 @@ var path       = require('path'),
     partials   = require('gulp-partial-to-script'),
     livereload = require('gulp-livereload'),
     server     = tinylr(),
-    openBrowser = require('./tasks/open');
+    openBrowser = require('./tasks/open'),
+    streamqueue = require('streamqueue');
 
 /**
  * Create a watcher for a glob it can activate livereload too
