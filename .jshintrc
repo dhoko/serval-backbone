@@ -16,6 +16,7 @@
   "globals": {
     "console": true,
     "module": true,
+    "require": true
 
     "$": true,
     "jQuery": true

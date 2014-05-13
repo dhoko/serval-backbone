@@ -3,6 +3,7 @@
 var gulp       = require('gulp'),
     gutil      = require('gulp-util'),
     express    = require('express'),
+    bodyParser = require('body-parser'),
     path       = require('path'),
     tinylr     = require('tiny-lr'),
     gopen      = require("gulp-open"),
@@ -14,7 +15,8 @@ var gulp       = require('gulp'),
     archiver   = require('archiver'),
     server     = tinylr(),
     convert    = require('gulp-convert'),
-    jeditor    = require("gulp-json-editor");
+    jeditor    = require("gulp-json-editor"),
+    tap     = require('gulp-tap');
 
 // Open a file and return a JSON
 var readJson = function(file) {
@@ -133,6 +135,10 @@ gulp.task('scripts', function(){
 // Create i18n file for the app
 gulp.task("i18n", function() {
     gulp.src('./i18n/*.yml')
+        .pipe(tap(function (file) {
+            // Create a yaml beggining with the language to have an object lang-Lang: {key;value}
+            file.contents = new Buffer(path.basename(file.path,".yml") + ":\n" +String(file.contents).replace(/^/gm,"  "));
+        }))
         .pipe(concat('languages.yml'))
         .pipe(convert({
             from: "yml",

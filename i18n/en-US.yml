@@ -1,12 +1,11 @@
-en-US:
-    title: 'Hi little butterfly !'
-    baseline: Welcome to
-    baselineInfo: Serval Boilerplate with Backbone.js
-    includes: "You're ready to code. It includes"
-    launchApp: "Open a terminal and run"
-    aboutTpl: "It uses a custom lodash templating cf:"
-    aboutTpl2: "You can of course remove these templateSettings, it's located inside"
-    aboutLink: "You can access to another page here "
-    aboutLink2: "or, use a button with an event listener."
-    aboutAnchor: "with an anchor"
-    buttonMsg: Next page
+title: 'Hi little butterfly !'
+baseline: Welcome to
+baselineInfo: Serval Boilerplate with Backbone.js
+includes: "You're ready to code. It includes"
+launchApp: "Open a terminal and run"
+aboutTpl: "It uses a custom lodash templating cf:"
+aboutTpl2: "You can of course remove these templateSettings, it's located inside"
+aboutLink: "You can access to another page here "
+aboutLink2: "or, use a button with an event listener."
+aboutAnchor: "with an anchor"
+buttonMsg: Next page
