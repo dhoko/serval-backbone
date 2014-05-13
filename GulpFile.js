@@ -1,153 +1,103 @@
 "use strict";
 
-var gulp       = require('gulp'),
-    gutil      = require('gulp-util'),
+var path       = require('path'),
+    es         = require('event-stream'),
     express    = require('express'),
     bodyParser = require('body-parser'),
-    path       = require('path'),
     tinylr     = require('tiny-lr'),
-    gopen      = require("gulp-open"),
+    gulp       = require('gulp'),
+    gutil      = require('gulp-util'),
     concat     = require("gulp-concat"),
     partials   = require('gulp-partial-to-script'),
-    fs         = require('fs'),
-    es         = require('event-stream'),
     livereload = require('gulp-livereload'),
-    archiver   = require('archiver'),
     server     = tinylr(),
-    convert    = require('gulp-convert'),
-    jeditor    = require("gulp-json-editor"),
-    tap     = require('gulp-tap');
+    openBrowser = require('./tasks/open');
 
-// Open a file and return a JSON
-var readJson = function(file) {
-  var src = fs.readFileSync(file, 'utf8', function (err,data) {
-    if (err) {
-      throw err;
+/**
+ * Create a watcher for a glob it can activate livereload too
+ * @param  {Glob} path
+ * @param  {Array} task  Task to launch
+ * @param  {Boolean} watch Activate a watch for livereloadq
+ */
+function watchThemAll(path, task, watch) {
+    var watcher = gulp.watch(path,task);
+    if(watch) {
+        watcher.on("change", function(file) {
+            gutil.log('File updated', gutil.colors.yellow(file.path));
+            livereload(server).changed(file.path);
+        });
     }
-    return data;
-  });
-  return JSON.parse(src);
-};
+}
 
 // Default task : Open url, lauch server, livereaload
 gulp.task('default',['assets','vendor','templates','scripts','styles','i18n'], function() {
 
   // Open Google Chrome @ localhost:8080
-  gulp.src('./build/index.html')
-    .pipe(gopen("",{
-      // app:"google-chrome",
-      app:"/usr/lib/chromium/chromium",
-      url: "http://localhost:8080/build/"
-   }));
+    openBrowser();
 
     var app = express();
+
+    app.use(bodyParser());
     app.use(express.static(path.resolve('./')));
     app.listen(8080, function() {
       gutil.log('Listening on', 8080);
     });
 
+    // Proxy for our request
+    app.all("/apitest", function(req,res) {
+        console.log();
+        console.log(req.body);
+        console.log();
+        res.send(201);
+    });
+
+    // Livereload listener
     server.listen(35729, function (err) {
         if (err) {
             throw err;
         }
 
-        gulp.watch(["./src/js/**/*","./i18n/*"], ["scripts"]);
-        gulp.watch(["./src/layout/**/*","./src/partials/**/*"], ["templates"]);
-        gulp.watch("./src/styles/*", ["styles"]);
-        gulp.watch("./src/vendor/**/*", ["vendor"]);
-        gulp.watch("./i18n/**/*.yml", ["i18n"]);
-
+        watchThemAll(["./src/js/**/*"], ["scripts"],true);
+        watchThemAll("./src/styles/*", ["styles"],true);
+        watchThemAll("./i18n/**/*.yml", ["i18n"],true);
+        watchThemAll(["./src/layout/**/*","./src/partials/**/*"], ["templates"]);
     });
 
 });
 
-// Build my css
-gulp.task('styles', function() {
-  gulp.src('./src/styles/*.css')
-    .pipe(concat('main.css'))
-    .pipe(gulp.dest('./build/styles/'))
+// Concatenate your partials and append them to index.html
+// We cannot put this inside a file yet :/ Fuckig watch task, it doesn't work...
+gulp.task('templates', function() {
+  // Thanks to https://github.com/gulpjs/gulp/issues/82. Without es.concat, we have to do CTRL S two times to have the valid view.
+    return es.merge(
+        gulp.src([
+        './src/layout/header.html',
+        './src/layout/body.html'
+        ]),
+        gulp.src('./src/partials/**/*.html').pipe(partials()),
+        gulp.src([
+        './src/layout/footer.html',
+        ])
+    )
+    .pipe(concat('index.html'))
+    .pipe(gulp.dest('./build'))
     .pipe(livereload(server));
 });
 
 // Build my css
-gulp.task('assets', function() {
-  gulp.src('./src/assets/**/*')
-    .pipe(gulp.dest('./build/assets/'));
-});
+gulp.task('styles', require('./tasks/styles'));
 
-// Concatenate your partials and append them to index.html
-gulp.task('templates', function() {
-  // Thanks to https://github.com/gulpjs/gulp/issues/82. Without es.concat, we have to do CTRL S to times to have the valid view.
-  return es.concat(
-    gulp.src('./src/partials/**/*.html')
-      .pipe(partials())
-      .pipe(concat('templates.html'))
-      .pipe(gulp.dest('./build'))
-  ).on("end", function() {
-    gulp.src([
-      './src/layout/header.html',
-      './src/layout/body.html',
-      './build/templates.html',
-      './src/layout/footer.html',
-    ])
-      .pipe(concat('index.html'))
-      .pipe(gulp.dest('./build'))
-      .pipe(livereload(server));
-  });
-});
+// Build our assets
+gulp.task('assets',require('./tasks/assets'));
+
 // Build your vendors
-gulp.task('vendor', function(){
-
-  var bowerDep = './' + readJson('./.bowerrc').directory;
-
-  return es.concat(
-    gulp.src([
-      bowerDep + '/jquery/dist/jquery.js',
-      bowerDep + '/lodash/dist/lodash.js',
-      bowerDep + '/backbone/backbone.js',
-      bowerDep + '/momentjs/moment.js',
-      bowerDep + '/swiftclick/js/libs/swiftclick.js'
-    ])
-      .pipe(concat("vendor.min.js"))
-      .pipe(gulp.dest('build/js')),
-    gulp.src(bowerDep + '/normalize-css/normalize.css')
-      .pipe(gulp.dest('build/styles'))
-  );
-
-});
+gulp.task('vendor', require("./tasks/vendor"));
 
 // Concatenate your app and build an app.js
-gulp.task('scripts', function(){
-  gulp.src([
-      './src/js/bootstrap.js',
-      './src/js/events/**/*.js',
-      './src/js/models/**/*.js',
-      './src/js/collections/**/*.js',
-      './src/js/views/**/*.js',
-      './src/js/routers/*.js',
-      './src/js/app.js',
-    ])
-    .pipe(concat('app.js'))
-    .pipe(gulp.dest('./build/js'))
-    .pipe(livereload(server));
-});
+gulp.task('scripts', require('./tasks/app'));
 
 // Create i18n file for the app
-gulp.task("i18n", function() {
-    gulp.src('./i18n/*.yml')
-        .pipe(tap(function (file) {
-            // Create a yaml beggining with the language to have an object lang-Lang: {key;value}
-            file.contents = new Buffer(path.basename(file.path,".yml") + ":\n" +String(file.contents).replace(/^/gm,"  "));
-        }))
-        .pipe(concat('languages.yml'))
-        .pipe(convert({
-            from: "yml",
-            to: "json"
-        }))
-        .pipe(concat('languages.json'))
-        .pipe(gulp.dest("./i18n/"))
-        .pipe(livereload(server));
-});
+gulp.task("i18n",require("./tasks/i18n"));
 
 // Generate your documentation using docker
 gulp.task('doc', function(){
