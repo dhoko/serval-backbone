@@ -14,8 +14,8 @@
     App.Languages = {};
     App.Languages.Instances = {};
     App.Languages.available = [];
-    
-        /**
+
+    /**
      * Get an instance for a view
      * @param  {String} name Name for a view
      * @return {Backbone.View}
@@ -25,7 +25,7 @@
             throw new Error("Cannot find an Instance for the view : " + name);
         }
         return App.Views.Instances[name];
-    }
+    };
 
     /**
      * Get an instance for a model
@@ -37,7 +37,7 @@
             throw new Error("Cannot find an Instance for the model : " + name);
         }
         return App.Models.Instances[name];
-    }
+    };
 
     /**
      * Get an instance for a collection
@@ -49,7 +49,7 @@
             throw new Error("Cannot find an Instance for the collection : " + name);
         }
         return App.Collections.Instances[name];
-    }
+    };
 
     /**
      * Get an instance for a Language
@@ -61,7 +61,19 @@
             throw new Error("Cannot find an Instance for the language : " + name);
         }
         return App.Languages.Instances[name];
-    }
+    };
+
+    /**
+     * Get the current instance for a language
+     * @param  {String} name Name for a language
+     * @return {Object}
+     */
+    App.currentLang = function getCurrentLanguageInstance() {
+        if(!App.Languages.Instances.hasOwnProperty(App.Languages.current)) {
+            throw new Error("Cannot find an Instance for the language : " + name);
+        }
+        return App.Languages.Instances[App.Languages.current];
+    };
 
 
 
