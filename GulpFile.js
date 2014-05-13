@@ -66,20 +66,21 @@ gulp.task('default',['assets','vendor','templates','scripts','styles','i18n'], f
 });
 
 // Concatenate your partials and append them to index.html
-// We cannot put this inside a file yet :/ Fuckig watch task, it doesn't work...
 gulp.task('templates', function() {
-  // Thanks to https://github.com/gulpjs/gulp/issues/82. Without es.concat, we have to do CTRL S two times to have the valid view.
-    return es.merge(
-        gulp.src([
+
+    var stream = streamqueue({objectMode: true});
+
+    stream.queue(gulp.src([
         './src/layout/header.html',
         './src/layout/body.html'
-        ]),
-        gulp.src('./src/partials/**/*.html').pipe(partials()),
-        gulp.src(['./src/layout/footer.html'])
-    )
-    .pipe(concat('index.html'))
-    .pipe(gulp.dest('./build'))
-    .pipe(livereload(server));
+    ]));
+    stream.queue(gulp.src('./src/partials/**/*.html').pipe(partials()));
+    stream.queue(gulp.src('./src/layout/footer.html'));
+
+    return stream.done()
+        .pipe(concat('index.html'))
+        .pipe(gulp.dest('./build'))
+        .pipe(livereload(server));
 });
 
 // Build my css
