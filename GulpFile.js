@@ -1,18 +1,17 @@
-"use strict";
-
-var path       = require('path'),
-    es         = require('event-stream'),
-    express    = require('express'),
-    bodyParser = require('body-parser'),
-    tinylr     = require('tiny-lr'),
-    gulp       = require('gulp'),
-    gutil      = require('gulp-util'),
-    concat     = require("gulp-concat"),
-    partials   = require('gulp-partial-to-script'),
-    livereload = require('gulp-livereload'),
-    server     = tinylr(),
+var path        = require('path'),
+    express     = require('express'),
+    bodyParser  = require('body-parser'),
+    tinylr      = require('tiny-lr'),
+    gulp        = require('gulp'),
+    gutil       = require('gulp-util'),
+    concat      = require("gulp-concat"),
+    partials    = require('gulp-partial-to-script'),
+    livereload  = require('gulp-livereload'),
+    server      = tinylr(),
     openBrowser = require('./tasks/open'),
-    streamqueue = require('streamqueue');
+    streamqueue = require('streamqueue'),
+    watchify    = require("watchify"),
+    source      = require('vinyl-source-stream');
 
 /**
  * Create a watcher for a glob it can activate livereload too
@@ -58,7 +57,6 @@ gulp.task('default',['assets','vendor','templates','scripts','styles','i18n'], f
             throw err;
         }
 
-        watchThemAll(["./src/js/**/*"], ["scripts"],true);
         watchThemAll("./src/styles/*", ["styles"],true);
         watchThemAll("./i18n/**/*.yml", ["i18n"],true);
         watchThemAll(["./src/layout/**/*","./src/partials/**/*"], ["templates"]);
@@ -84,6 +82,31 @@ gulp.task('templates', function() {
         .pipe(livereload(server));
 });
 
+// Concatenate your app and build an app.js
+gulp.task('scripts', function() {
+    var bundler = watchify('./src/js/app.js');
+
+    bundler.on('update',rebundle);
+
+    function rebundle(file) {
+
+        if(file) {
+            file.map(function (fileName) {
+                gutil.log('File updated', gutil.colors.yellow(fileName));
+            });
+        }
+        return bundler
+            .bundle({
+                debug: (gutil.env.type !== 'prod')
+            })
+            .pipe(source("app.js"))
+            .pipe(gulp.dest('./build/js'))
+            .pipe(livereload(server));
+    }
+
+    return rebundle();
+});
+
 // Build my css
 gulp.task('styles', require('./tasks/styles'));
 
@@ -92,9 +115,6 @@ gulp.task('assets',require('./tasks/assets'));
 
 // Build your vendors
 gulp.task('vendor', require("./tasks/vendor"));
-
-// Concatenate your app and build an app.js
-gulp.task('scripts', require('./tasks/app'));
 
 // Create i18n file for the app
 gulp.task("i18n",require("./tasks/i18n"));

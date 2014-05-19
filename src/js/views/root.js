@@ -1,29 +1,27 @@
-// http://backbonejs.org/#View
-(function(win, doc, App){
-    "use strict";
+var App = require('../start'),
+  MasterView = require('./masterView');
 
-    /**
-    * Root View
-    * @type {object}
-    */
-    App.Views.Root = App.Views.MasterView.extend({
+/**
+* Root View
+* @type {Backbone.View}
+*/
+module.exports = MasterView.extend({
 
-        template: tpl('root'),
+  template: tpl('root'),
 
-        events: {
-            "click .btn-action-x" : "button",
-        },
+  events: {
+    "click .btn-action-x" : "button",
+  },
 
-        button : function button(){
-            console.log("This event is called before we swicth to another page");
-        },
+  button : function button(){
+    console.log("This event is called before we swicth to another page");
+  },
 
-        // Execute before the render. It can also bind data to the view.
-        // Here we bind a key lang to the view
-        beforeRender: function beforeRender() {
-            return {lang: App.Languages.available};
-        }
-    });
-
-
-})(window, window.document, window.app || (window.app = {}));
+  // Execute before the render. It can also bind data to the view.
+  // Here we bind a key lang to the view
+  beforeRender: function beforeRender() {
+    return {
+      lang: App.Languages.available
+    };
+  }
+});
