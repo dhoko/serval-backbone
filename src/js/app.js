@@ -1,15 +1,11 @@
-/**
- * This is where all begins
- */
-(function init(win, doc, App){
+var App = require('./start');
+var Bootstrap = require('./bootstrap');
+var Router = require('./routers/router');
 
-  $(doc).ready(function() {
-    win.i18nLoader(function loadI18n() {
-      App.Routers.Instances.router = new App.Routers.Router();
-      Backbone.history.start();
-      var swiftclick = SwiftClick.attach(doc.body);
-    });
+$(document).ready(function() {
+  Bootstrap.i18nLoader(function loadI18n() {
+    App.Routers.Instances.router = new Router();
+    Backbone.history.start();
+    App.swiftclick = SwiftClick.attach(document.body);
   });
-
-})(window, window.document, window.app || (window.app = {}));
-
+});

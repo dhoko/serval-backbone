@@ -1,12 +1,13 @@
 {
-  "name": "Backbone boilerplate for serval",
-  "version": "1.5.0",
+  "name": "serval-backbone",
+  "version": "2.1.0",
   "authors": [
     "dhoko"
   ],
   "description": "Backbone boilerplate generator with gulp",
   "keywords": [
     "boilerplate",
+    "browserify",
     "backbone"
   ],
   "license": "MIT",
