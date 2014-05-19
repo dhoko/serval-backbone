@@ -10,9 +10,8 @@ If you have [docker.js](http://jbt.github.io/docker/src/docker.js.html) you can 
 
 - node.js
 - npm
-- bower
 
-Ok, let's run : `npm install && bower install`
+Ok, let's run : `npm install`
 
 ### Not included:
 
@@ -134,8 +133,6 @@ It can be anything else, but he has to have these:
 ├── README.md
 ├── .jshintrc
 ├── .editorconfig
-├── .bowerrc
-├── bower.json
 ├── package.json
 ├── build // final files
 ├── i18n // for i18n
