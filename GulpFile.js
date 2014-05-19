@@ -66,47 +66,12 @@ gulp.task('default',['assets','vendor','templates','scripts','styles','i18n'], f
 
 // Concatenate your partials and append them to index.html
 gulp.task('templates', function() {
-
-    var stream = streamqueue({objectMode: true});
-
-    stream.queue(gulp.src([
-        './src/layout/header.html',
-        './src/layout/body.html'
-    ]));
-    stream.queue(gulp.src('./src/partials/**/*.html').pipe(partials()));
-    stream.queue(gulp.src('./src/layout/footer.html'));
-
-    return stream.done()
-        .pipe(concat('index.html'))
-        .pipe(gulp.dest('./build'))
-        .pipe(livereload(server));
+    require('./tasks/templates')(server);
 });
 
 // Concatenate your app and build an app.js
 gulp.task('scripts', function() {
-    var bundler = watchify('./src/js/app.js');
-
-    bundler.on('update',rebundle);
-
-    function rebundle(file) {
-
-        if(file) {
-            file.map(function (fileName) {
-                gutil.log('File updated', gutil.colors.yellow(fileName));
-            });
-        }
-
-        // Create sourceMap for dev
-        return bundler
-            .bundle({
-                debug: (gutil.env.type !== 'prod')
-            })
-            .pipe(source("app.js"))
-            .pipe(gulp.dest('./build/js'))
-            .pipe(livereload(server));
-    }
-
-    return rebundle();
+    require('./tasks/app')(server);
 });
 
 // Build my css
