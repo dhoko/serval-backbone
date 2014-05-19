@@ -1,3 +1,4 @@
 node_modules/
 src/vendor/
 build/
+i18n/languages.json

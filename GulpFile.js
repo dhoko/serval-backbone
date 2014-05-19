@@ -95,6 +95,8 @@ gulp.task('scripts', function() {
                 gutil.log('File updated', gutil.colors.yellow(fileName));
             });
         }
+
+        // Create sourceMap for dev
         return bundler
             .bundle({
                 debug: (gutil.env.type !== 'prod')
@@ -123,4 +125,14 @@ gulp.task("i18n",require("./tasks/i18n"));
 gulp.task('doc', function(){
   var spawn = require('child_process').spawn;
   spawn('docker', ['-i','./src','-x','vendor','-n'], {stdio: 'inherit'});
+});
+
+
+// Set our env to production
+gulp.task('env', function(){
+    gutil.env.type = 'prod';
+});
+// Prod all the things !
+gulp.task('prod',['env','assets','vendor','templates','scripts','styles','manifest','i18n'], function() {
+    gulp.start("doc");
 });
